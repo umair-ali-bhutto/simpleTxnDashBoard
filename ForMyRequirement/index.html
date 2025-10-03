@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Premium Transaction Dashboard</title>
+  <!-- TailwindCSS local -->
+  <link href="libs/tailwind.min.css" rel="stylesheet">
+
+  <style>
+    /* Glassmorphism */
+    .glass {
+      background: rgba(255, 255, 255, 0.25);
+      backdrop-filter: blur(16px) saturate(180%);
+      -webkit-backdrop-filter: blur(16px) saturate(180%);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    /* Card Animation */
+    .kpi-card {
+      opacity: 0;
+      transform: translateY(20px) scale(0.95);
+      animation: fadeSlideIn 1s ease forwards;
+    }
+
+    .kpi-card:hover {
+      transition: all 0.5s;
+    }
+
+    .table-card:hover {
+      transition: all 0.5s;
+    }
+
+
+    @keyframes fadeSlideIn {
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    /* Table Animation */
+    tbody tr {
+      opacity: 0;
+      animation: fadeGlow 0.6s ease forwards;
+    }
+
+    tbody tr:nth-child(1) {
+      animation-delay: 0.3s;
+    }
+
+
+
+    @keyframes fadeGlow {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    tbody tr:hover {
+      background: rgba(59, 130, 246, 0.08);
+      transition: 0.2s ease;
+    }
+  </style>
+</head>
+
+<body class="bg-gradient-to-br from-blue-100 via-white to-indigo-100 min-h-screen p-8 font-sans">
+
+  <div class="max-w-7xl mx-auto space-y-8">
+    <!-- Header -->
+    <h1 id="dashboardTitle"
+      class="text-4xl font-extrabold text-center bg-gradient-to-r from-blue-600 via-purple-600 to-cyan-500 bg-clip-text text-transparent drop-shadow-sm">
+      ✨ Dashboard
+    </h1>
+
+    <!-- KPI Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div class="glass kpi-card p-6 rounded-2xl shadow-lg text-center 
+           transition transform hover:scale-105 hover:shadow-2xl 
+           hover:border hover:border-blue-400 hover:bg-white/70">
+        <h2 class="text-sm text-gray-600">Total Transactions Pending</h2>
+        <p id="kpiTotal" class="text-2xl font-bold text-blue-600">0</p>
+      </div>
+
+      <div class="glass kpi-card p-6 rounded-2xl shadow-lg text-center 
+           transition transform hover:scale-105 hover:shadow-2xl 
+           hover:border hover:border-purple-400 hover:bg-white/70">
+        <h2 class="text-sm text-gray-600">Total Transactions Completed Today</h2>
+        <p id="kpiTotalCompleted" class="text-2xl font-bold text-purple-600">0</p>
+      </div>
+    </div>
+
+
+    <!-- Table Card -->
+    <div class="table-card glass rounded-3xl shadow-2xl overflow-hidden hover:border hover:border-green-300 ">
+      <div class="p-6 border-b border-gray-200 flex flex-col md:flex-row justify-between items-center gap-3">
+        <input type="text" id="searchInput" placeholder="🔍 Search transactions..."
+          class="px-5 py-3 w-full md:w-1/2 rounded-full bg-white/60 border border-gray-300 focus:ring-2 focus:ring-blue-500 outline-none text-sm shadow-sm">
+        <div class="flex gap-2">
+          <button onclick="exportTable('excel')"
+            class="px-4 py-2 bg-green-500 text-white rounded-full shadow hover:bg-green-600">⬇ Excel</button>
+          <button onclick="exportTable('pdf')"
+            class="px-4 py-2 bg-red-500 text-white rounded-full shadow hover:bg-red-600">⬇ PDF</button>
+        </div>
+      </div>
+
+      <!-- Table -->
+      <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-200 text-sm" id="txnTable">
+          <thead
+            class="bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 text-white uppercase tracking-wider text-xs">
+            <tr>
+              <th class="px-6 py-4 text-left">Date</th>
+              <th class="px-6 py-4 text-left">Transaction Type</th>
+              <th class="px-6 py-4 text-left">End Point</th>
+              <th class="px-6 py-4 text-left">Total</th>
+              <th class="px-6 py-4 text-left">Min ID</th>
+              <th class="px-6 py-4 text-left">Max ID</th>
+              <th class="px-6 py-4 text-left">Min Entry Date</th>
+              <th class="px-6 py-4 text-left">Max Entry Date</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="px-6 py-4">2025-09-30</td>
+              <td class="px-6 py-4"><span
+                  class="px-3 py-1 rounded-full bg-green-100 text-green-700 text-xs font-semibold">SALE</span></td>
+              <td class="px-6 py-4">POS-001</td>
+              <td class="px-6 py-4 font-semibold text-blue-600">150</td>
+              <td class="px-6 py-4">101</td>
+              <td class="px-6 py-4">250</td>
+              <td class="px-6 py-4">2025-09-30 09:01</td>
+              <td class="px-6 py-4">2025-09-30 09:59</td>
+            </tr>
+            <tr>
+              <td class="px-6 py-4">2025-09-30</td>
+              <td class="px-6 py-4"><span
+                  class="px-3 py-1 rounded-full bg-orange-100 text-orange-700 text-xs font-semibold">COMPLETION</span>
+              </td>
+              <td class="px-6 py-4">ATM-778</td>
+              <td class="px-6 py-4 font-semibold text-green-600">92</td>
+              <td class="px-6 py-4">300</td>
+              <td class="px-6 py-4">392</td>
+              <td class="px-6 py-4">2025-09-30 08:15</td>
+              <td class="px-6 py-4">2025-09-30 08:45</td>
+            </tr>
+            <tr>
+              <td class="px-6 py-4">2025-09-29</td>
+              <td class="px-6 py-4"><span
+                  class="px-3 py-1 rounded-full bg-purple-100 text-purple-700 text-xs font-semibold">PRE AUTH</span>
+              </td>
+              <td class="px-6 py-4">WEB-API</td>
+              <td class="px-6 py-4 font-semibold text-purple-600">47</td>
+              <td class="px-6 py-4">501</td>
+              <td class="px-6 py-4">547</td>
+              <td class="px-6 py-4">2025-09-29 14:00</td>
+              <td class="px-6 py-4">2025-09-29 14:30</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+
+
+
+
+
+
+    <!-- Table Card -->
+    <div
+      class="grid grid-cols-1 md:grid-cols-2 table-card glass rounded-3xl shadow-2xl overflow-hidden  hover:border hover:border-green-300 ">
+
+
+      <!-- Table -->
+      <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-200 text-sm" id="txnTableCompleted">
+          <thead
+            class="bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 text-white uppercase tracking-wider text-xs">
+            <tr>
+              <th class="px-6 py-4">Transaction Status</th>
+              <th class="px-6 py-4">Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="px-6 py-4">PROCESSED SUCCESSFULLY</td>
+              <td class="px-6 py-4">101</td>
+            </tr>
+            <tr>
+              <td class="px-6 py-4">FAILED</td>
+              <td class="px-6 py-4">1</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+
+      <div class="p-6 border-b border-gray-200 flex flex-col md:flex-row justify-between items-center gap-3">
+        <input type="text" id="searchInputCompleted" placeholder="🔍 Search transactions..."
+          class="px-5 py-3 w-full md:w-1/2 rounded-full bg-white/60 border border-gray-300 focus:ring-2 focus:ring-blue-500 outline-none text-sm shadow-sm">
+        <div class="flex gap-2">
+          <button onclick="exportTableForCompleted('excel')"
+            class="px-4 py-2 bg-green-500 text-white rounded-full shadow hover:bg-green-600">⬇ Excel</button>
+          <button onclick="exportTableForCompleted('pdf')"
+            class="px-4 py-2 bg-red-500 text-white rounded-full shadow hover:bg-red-600">⬇ PDF</button>
+        </div>
+      </div>
+
+
+    </div>
+
+
+    <!-- XLSX local -->
+    <script src="libs/xlsx.full.min.js"></script>
+    <!-- jsPDF local -->
+    <script src="libs/jspdf.umd.min.js"></script>
+    <script src="libs/jspdf.plugin.autotable.min.js"></script>
+    <script>
+      //set dat time in heading
+      function setDateTime() {
+        const now = new Date();
+        const formatted = now.toLocaleString("en-US", {
+          weekday: "long",
+          year: "numeric",
+          month: "short",
+          day: "2-digit",
+          hour: "2-digit",
+          minute: "2-digit",
+          second: "2-digit"
+        });
+
+        document.getElementById("dashboardTitle").innerHTML =
+          `✨ Dashboard <br><span style="font-size:18px; font-weight:normal;">${formatted}</span>`;
+      }
+      setDateTime();
+
+      // KPI Update
+      function updateKPIs() {
+        const rows = document.querySelectorAll("#txnTable tbody tr");
+        let total = 0;
+        rows.forEach(r => {
+          if (r.style.display === "none") return; // skip hidden rows
+          const t = parseFloat(r.cells[3].innerText);
+          total += t;
+        });
+        document.getElementById("kpiTotal").innerText = total || 0;
+
+
+        const rowsCompleted = document.querySelectorAll("#txnTableCompleted tbody tr");
+        let totalCompleted = 0;
+        rowsCompleted.forEach(r => {
+          if (r.style.display === "none") return; // skip hidden rows
+          const t = parseFloat(r.cells[1].innerText);
+          totalCompleted += t;
+        });
+
+        document.getElementById("kpiTotalCompleted").innerText = totalCompleted || 0;
+
+      }
+      updateKPIs();
+
+      // Export
+      function exportTable(type) {
+        const table = document.getElementById("txnTable");
+        if (type === "excel") {
+          const wb = XLSX.utils.table_to_book(table);
+          XLSX.writeFile(wb, "transactions.xlsx");
+        } else if (type === "pdf") {
+          const { jsPDF } = window.jspdf;
+          const doc = new jsPDF("l", "pt", "a4"); // landscape for wide tables
+          doc.text("Transaction Data", 40, 40);
+          doc.autoTable({ html: "#txnTable", startY: 60 });
+          doc.save("transactions.pdf");
+        }
+      }
+
+      //   // Export table for completed txn
+      function exportTableForCompleted(type) {
+        const table = document.getElementById("txnTableCompleted");
+        if (type === "excel") {
+          const wb = XLSX.utils.table_to_book(table);
+          XLSX.writeFile(wb, "transactions.xlsx");
+        } else if (type === "pdf") {
+          const { jsPDF } = window.jspdf;
+          const doc = new jsPDF("l", "pt", "a4"); // landscape for wide tables
+          doc.text("Transaction Data", 40, 40);
+          doc.autoTable({ html: "#txnTableCompleted", startY: 60 });
+          doc.save("transactions.pdf");
+        }
+      }
+
+
+
+      // Search filter
+      document.getElementById("searchInput").addEventListener("keyup", function () {
+        const filter = this.value.toLowerCase();
+        const rows = document.querySelectorAll("#txnTable tbody tr");
+        rows.forEach(row => {
+          const text = row.innerText.toLowerCase();
+          row.style.display = text.includes(filter) ? "" : "none";
+        });
+        updateKPIs(); // refresh KPIs after filtering
+      });
+
+      // Search filter for completed txn
+      document.getElementById("searchInputCompleted").addEventListener("keyup", function () {
+        const filter = this.value.toLowerCase();
+        const rows = document.querySelectorAll("#txnTableCompleted tbody tr");
+        rows.forEach(row => {
+          const text = row.innerText.toLowerCase();
+          row.style.display = text.includes(filter) ? "" : "none";
+        });
+        updateKPIs(); // refresh KPIs after filtering
+      });
+
+    </script>
+
+</body>
+
+</html>

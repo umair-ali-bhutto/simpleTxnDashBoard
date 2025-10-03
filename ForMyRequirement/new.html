@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Premium Transaction Dashboard</title>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #cfe9ff, #ffffff, #d9d9ff);
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      font-weight: 800;
+      text-align: center;
+      background: linear-gradient(to right, #2563eb, #9333ea, #06b6d4);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.15);
+      margin-bottom: 40px;
+    }
+
+    .glass {
+      background: rgba(255, 255, 255, 0.25);
+      backdrop-filter: blur(16px) saturate(180%);
+      -webkit-backdrop-filter: blur(16px) saturate(180%);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 16px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+      transition: all 0.3s ease;
+    }
+
+    .glass:hover {
+      border-color: #60a5fa;
+      background: rgba(255, 255, 255, 0.6);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+      margin-bottom: 30px;
+    }
+
+    .kpi-card {
+      padding: 20px;
+      text-align: center;
+      animation: fadeSlideIn 1s ease forwards;
+      opacity: 0;
+      transform: translateY(20px) scale(0.95);
+    }
+
+    @keyframes fadeSlideIn {
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    .kpi-card h2 {
+      font-size: 14px;
+      color: #555;
+      margin-bottom: 10px;
+    }
+
+    .kpi-card p {
+      font-size: 24px;
+      font-weight: bold;
+      color: #2563eb;
+    }
+
+    .kpi-card.purple p {
+      color: #9333ea;
+    }
+
+    /* Table Styling */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+
+    thead {
+      background: linear-gradient(to right, #2563eb, #9333ea, #4338ca);
+      color: #fff;
+      text-transform: uppercase;
+    }
+
+    th,
+    td {
+      padding: 12px 16px;
+      text-align: left;
+    }
+
+    tbody tr {
+      opacity: 0;
+      animation: fadeGlow 0.6s ease forwards;
+    }
+
+    tbody tr:nth-child(1) {
+      animation-delay: 0.1s;
+    }
+
+    tbody tr:nth-child(2) {
+      animation-delay: 0.2s;
+    }
+
+    tbody tr:nth-child(3) {
+      animation-delay: 0.3s;
+    }
+
+    tbody tr:nth-child(4) {
+      animation-delay: 0.4s;
+    }
+
+    tbody tr:nth-child(5) {
+      animation-delay: 0.5s;
+    }
+
+    tbody tr:nth-child(6) {
+      animation-delay: 0.6s;
+    }
+
+    tbody tr:nth-child(7) {
+      animation-delay: 0.7s;
+    }
+
+    tbody tr:nth-child(8) {
+      animation-delay: 0.8s;
+    }
+
+    tbody tr:nth-child(9) {
+      animation-delay: 0.9s;
+    }
+
+    tbody tr:nth-child(10) {
+      animation-delay: 1s;
+    }
+
+    @keyframes fadeGlow {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    tbody tr:hover {
+      background: rgba(59, 130, 246, 0.08);
+      transition: background 0.2s ease;
+    }
+
+    .search-bar {
+      padding: 10px 14px;
+      border-radius: 30px;
+      border: 1px solid #ccc;
+      width: 100%;
+      max-width: 300px;
+      outline: none;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    }
+
+    .controls {
+      display: flex;
+      gap: 10px;
+    }
+
+    button {
+      padding: 10px 16px;
+      border: none;
+      border-radius: 20px;
+      color: #fff;
+      font-size: 14px;
+      cursor: pointer;
+      box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15);
+      transition: background 0.2s ease;
+    }
+
+    .btn-excel {
+      background: #22c55e;
+    }
+
+    .btn-excel:hover {
+      background: #16a34a;
+    }
+
+    .btn-pdf {
+      background: #ef4444;
+    }
+
+    .btn-pdf:hover {
+      background: #dc2626;
+    }
+
+    .table-card {
+      margin-top: 20px;
+      overflow-x: auto;
+    }
+
+    .table-card>div {
+      padding: 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      border-bottom: 1px solid #ddd;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- Header -->
+  <h1 id="dashboardTitle">✨ Dashboard</h1>
+
+  <!-- KPI Cards -->
+  <div class="grid">
+    <div class="glass kpi-card">
+      <h2>Total Transactions Pending</h2>
+      <p id="kpiTotal">0</p>
+    </div>
+    <div class="glass kpi-card purple">
+      <h2>Total Transactions Processed Today</h2>
+      <p id="kpiTotalCompleted">0</p>
+    </div>
+
+    <div class="glass kpi-card purple">
+      <h2>Total Transactions Processed Yesterday</h2>
+      <p id="kpiTotalPreviousCompleted">0</p>
+    </div>
+  </div>
+
+  <!-- Table Card -->
+  <div class="glass table-card">
+    <h4 style="padding-left: 1%;margin-bottom: 0px;">Pending Transactions Status</h4>
+    <div>
+
+      <input type="text" id="searchInput" placeholder="🔍 Search transactions..." class="search-bar"
+        onkeyup="filterTable('txnTable', this)" title="Search transactions">
+
+
+      <div class="controls">
+        <button class="btn-excel" onclick="exportTableToExcel('txnTable', 'Pending-Transactions')">⬇ Excel</button>
+      </div>
+    </div>
+
+    <table id="txnTable">
+      <thead>
+        <tr>
+          <th>Transaction Type</th>
+          <th>End Point</th>
+          <th>Total</th>
+          <th>Min ID</th>
+          <th>Max ID</th>
+          <th>Min Entry Date</th>
+          <th>Max Entry Date</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>SALE</td>
+          <td>POS-001</td>
+          <td>150</td>
+          <td>101</td>
+          <td>250</td>
+          <td>2025-09-30 09:01</td>
+          <td>2025-09-30 09:59</td>
+        </tr>
+        <tr>
+          <td>COMPLETION</td>
+          <td>ATM-778</td>
+          <td>92</td>
+          <td>300</td>
+          <td>392</td>
+          <td>2025-09-30 08:15</td>
+          <td>2025-09-30 08:45</td>
+        </tr>
+        <tr>
+          <td>PRE AUTH</td>
+          <td>WEB-API</td>
+          <td>47</td>
+          <td>501</td>
+          <td>547</td>
+          <td>2025-09-29 14:00</td>
+          <td>2025-09-29 14:30</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+
+
+
+
+
+  <div class="grid">
+    <!-- Table Card -->
+    <div class="glass table-card">
+      <h4 style="padding-left: 3%;margin-bottom: 0px;">Today's Status</h4>
+
+      <div>
+        <input type="text" id="searchInputCompleted" placeholder="🔍 Search transactions..." class="search-bar"
+          onkeyup="filterTable('txnTableCompleted', this)" title="Search transactions">
+        <div class="controls">
+          <button class="btn-excel" onclick="exportTableToExcel('txnTableCompleted', 'Completed-Transactions')">⬇
+            Excel</button>
+        </div>
+      </div>
+
+      <table id="txnTableCompleted">
+        <thead>
+          <tr>
+            <th>Transaction Status</th>
+            <th>Total</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>PROCESSED SUCCESSFULLY</td>
+            <td>101</td>
+          </tr>
+          <tr>
+            <td>FAILED</td>
+            <td>1</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+
+    <!-- Table Card -->
+    <div class="glass table-card">
+      <h4 style="padding-left: 3%;margin-bottom: 0px;">Yesterday's Status</h4>
+
+      <div>
+        <input type="text" id="searchInputPreviousCompleted" placeholder="🔍 Search transactions..." class="search-bar"
+          onkeyup="filterTable('txnTablePreviousCompleted', this)" title="Search transactions">
+        <div class="controls">
+          <button class="btn-excel"
+            onclick="exportTableToExcel('txnTablePreviousCompleted', 'Completed-Yesterday-Transactions')">⬇
+            Excel</button>
+        </div>
+      </div>
+
+      <table id="txnTablePreviousCompleted">
+        <thead>
+          <tr>
+            <th>Transaction Status</th>
+            <th>Total</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>PROCESSED SUCCESSFULLY</td>
+            <td>1,100</td>
+          </tr>
+          <tr>
+            <td>FAILED</td>
+            <td>10</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+
+  <script>
+    // Set dynamic date and time in header
+    function setDateTime() {
+      const now = new Date();
+      const formatted = now.toLocaleString("en-US", {
+        weekday: "long",
+        year: "numeric",
+        month: "short",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit"
+      });
+      document.getElementById("dashboardTitle").innerHTML =
+        `✨ Dashboard <br><span style="font-size:16px; font-weight:normal;">${formatted}</span>`;
+    }
+    setDateTime();
+
+    // KPI update
+    function updateKPIs() {
+      let total = 0;
+      let totalCompleted = 0;
+      let totalPreviousCompleted = 0;
+
+      document.querySelectorAll("#txnTable tbody tr").forEach(r => {
+        if (r.style.display === "none") return;
+        total += parseFloat(r.cells[2].innerText.replace(/,/g, "")) || 0;
+      });
+
+
+      document.querySelectorAll("#txnTableCompleted tbody tr").forEach(r => {
+        if (r.style.display === "none") return;
+        totalCompleted += parseFloat(r.cells[1].innerText.replace(/,/g, "")) || 0;
+      });
+
+      document.querySelectorAll("#txnTablePreviousCompleted tbody tr").forEach(r => {
+        if (r.style.display === "none") return;
+        totalPreviousCompleted += parseFloat(r.cells[1].innerText.replace(/,/g, "")) || 0;
+      });
+
+
+      document.getElementById("kpiTotal").innerText = total || 0;
+      document.getElementById("kpiTotalCompleted").innerText = totalCompleted || 0; // Example static total
+      document.getElementById("kpiTotalPreviousCompleted").innerText = totalPreviousCompleted || 0; // Example static total
+
+    }
+    updateKPIs();
+
+
+    function filterTable(tableName, input) {
+      const filter = input.value.toLowerCase();
+      const rows = document.querySelectorAll("#" + tableName + " tbody tr");
+      rows.forEach(row => {
+        const text = row.innerText.toLowerCase();
+        row.style.display = text.includes(filter) ? "" : "none";
+      });
+    }
+
+    // Pure Excel Export
+    function exportTableToExcel(tableID, filename = '') {
+      const table = document.getElementById(tableID);
+      const html = table.outerHTML.replace(/ /g, '%20');
+
+      // File name
+      filename = filename ? filename + '.xls' : 'excel_data.xls';
+
+      // Create download link
+      const a = document.createElement("a");
+      a.href = 'data:application/vnd.ms-excel,' + html;
+      a.download = filename;
+      a.click();
+    }
+  </script>
+</body>
+
+</html>
