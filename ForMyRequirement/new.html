@@ -193,7 +193,7 @@
     .btn-excel:hover {
       background: #16a34a;
     }
-    
+
     .table-card {
 
       opacity: 0;
@@ -502,7 +502,11 @@
       const table = document.getElementById(tableID);
       const html = table.outerHTML.replace(/ /g, '%20');
 
-      filename = filename ? filename + '.xls' : 'excel_data.xls';
+      const now = new Date();
+      const formatted = now.toLocaleString("sv-SE").replace("T", " ");
+
+
+      filename = filename ? filename + formatted + '.xls' : 'excel_data.xls';
 
       const a = document.createElement("a");
       a.href = 'data:application/vnd.ms-excel,' + html;
