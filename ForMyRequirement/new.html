@@ -20,6 +20,7 @@
       font-weight: 800;
       text-align: center;
       background: linear-gradient(to right, #2563eb, #9333ea, #06b6d4);
+      background-clip: text;
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.15);
@@ -79,7 +80,6 @@
       color: #9333ea;
     }
 
-    /* Table Styling */
     table {
       width: 100%;
       border-collapse: collapse;
@@ -232,8 +232,12 @@
   <!-- KPI Cards -->
   <div class="grid">
     <div class="glass kpi-card">
-      <h2>Total Transactions Pending</h2>
+      <h2>Total Transactions Pending Today</h2>
       <p id="kpiTotal">0</p>
+    </div>
+    <div class="glass kpi-card">
+      <h2>Total Transactions Pending Before</h2>
+      <p id="kpiTotalOld">0</p>
     </div>
     <div class="glass kpi-card purple">
       <h2>Total Transactions Processed Today</h2>
@@ -248,7 +252,7 @@
 
   <!-- Table Card -->
   <div class="glass table-card">
-    <h4 style="padding-left: 1%;margin-bottom: 0px;">Pending Transactions Status</h4>
+    <h4 style="padding-left: 1%;margin-bottom: 0px;">Pending Transactions Status Today</h4>
     <div>
 
       <input type="text" id="searchInput" placeholder="🔍 Search transactions..." class="search-bar"
@@ -305,6 +309,65 @@
   </div>
 
 
+
+  <!-- Table Card -->
+  <div class="glass table-card">
+    <h4 style="padding-left: 1%;margin-bottom: 0px;">Pending Transactions Status Before</h4>
+    <div>
+
+      <input type="text" id="searchInput" placeholder="🔍 Search transactions..." class="search-bar"
+        onkeyup="filterTable('txnTableOld', this)" title="Search transactions">
+
+
+      <div class="controls">
+        <button class="btn-excel" onclick="exportTableToExcel('txnTableOld', 'Pending-Old-Transactions')">⬇
+          Excel</button>
+      </div>
+    </div>
+
+    <table id="txnTableOld">
+      <thead>
+        <tr>
+          <th>Transaction Type</th>
+          <th>End Point</th>
+          <th>Total</th>
+          <th>Min ID</th>
+          <th>Max ID</th>
+          <th>Min Entry Date</th>
+          <th>Max Entry Date</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>SALE</td>
+          <td>POS-001</td>
+          <td>15000</td>
+          <td>101</td>
+          <td>250</td>
+          <td>2025-09-30 09:01</td>
+          <td>2025-09-30 09:59</td>
+        </tr>
+        <tr>
+          <td>COMPLETION</td>
+          <td>ATM-778</td>
+          <td>92</td>
+          <td>300</td>
+          <td>392</td>
+          <td>2025-09-30 08:15</td>
+          <td>2025-09-30 08:45</td>
+        </tr>
+        <tr>
+          <td>PRE AUTH</td>
+          <td>WEB-API</td>
+          <td>47</td>
+          <td>501</td>
+          <td>547</td>
+          <td>2025-09-29 14:00</td>
+          <td>2025-09-29 14:30</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
 
 
 
@@ -381,7 +444,6 @@
 
 
   <script>
-    // Set dynamic date and time in header
     function setDateTime() {
       const now = new Date();
       const formatted = now.toLocaleString("en-US", {
@@ -397,15 +459,21 @@
     }
     setDateTime();
 
-    // KPI update
     function updateKPIs() {
       let total = 0;
+      let totalOld = 0;
       let totalCompleted = 0;
       let totalPreviousCompleted = 0;
 
       document.querySelectorAll("#txnTable tbody tr").forEach(r => {
         if (r.style.display === "none") return;
         total += parseFloat(r.cells[2].innerText.replace(/,/g, "")) || 0;
+      });
+
+
+      document.querySelectorAll("#txnTableOld tbody tr").forEach(r => {
+        if (r.style.display === "none") return;
+        totalOld += parseFloat(r.cells[2].innerText.replace(/,/g, "")) || 0;
       });
 
 
@@ -421,8 +489,9 @@
 
 
       document.getElementById("kpiTotal").innerText = total || 0;
-      document.getElementById("kpiTotalCompleted").innerText = totalCompleted || 0; // Example static total
-      document.getElementById("kpiTotalPreviousCompleted").innerText = totalPreviousCompleted || 0; // Example static total
+      document.getElementById("kpiTotalOld").innerText = totalOld || 0;
+      document.getElementById("kpiTotalCompleted").innerText = totalCompleted || 0;
+      document.getElementById("kpiTotalPreviousCompleted").innerText = totalPreviousCompleted || 0;
 
     }
     updateKPIs();
@@ -437,15 +506,12 @@
       });
     }
 
-    // Pure Excel Export
     function exportTableToExcel(tableID, filename = '') {
       const table = document.getElementById(tableID);
       const html = table.outerHTML.replace(/ /g, '%20');
 
-      // File name
       filename = filename ? filename + '.xls' : 'excel_data.xls';
 
-      // Create download link
       const a = document.createElement("a");
       a.href = 'data:application/vnd.ms-excel,' + html;
       a.download = filename;
